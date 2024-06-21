@@ -288,6 +288,130 @@
           }
         }
       }
+    },
+    "/schemas-by-ref/shape": {
+      "get": {
+        "tags": [
+          "Sample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "$type"
+                ],
+                "type": "object",
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ShapeTriangle"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ShapeSquare"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "$type",
+                  "mapping": {
+                    "triangle": "#/components/schemas/ShapeTriangle",
+                    "square": "#/components/schemas/ShapeSquare"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/schemas-by-ref/weatherforecastbase": {
+      "get": {
+        "tags": [
+          "Sample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "$type"
+                ],
+                "type": "object",
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/WeatherForecastBaseWeatherForecastWithCity"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WeatherForecastBaseWeatherForecastWithTimeSeries"
+                  },
+                  {
+                    "$ref": "#/components/schemas/WeatherForecastBaseWeatherForecastWithLocalNews"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "$type",
+                  "mapping": {
+                    "0": "#/components/schemas/WeatherForecastBaseWeatherForecastWithCity",
+                    "1": "#/components/schemas/WeatherForecastBaseWeatherForecastWithTimeSeries",
+                    "2": "#/components/schemas/WeatherForecastBaseWeatherForecastWithLocalNews"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/schemas-by-ref/person": {
+      "get": {
+        "tags": [
+          "Sample"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "discriminator"
+                ],
+                "type": "object",
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/PersonStudent"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PersonTeacher"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "discriminator",
+                  "mapping": {
+                    "student": "#/components/schemas/PersonStudent",
+                    "teacher": "#/components/schemas/PersonTeacher"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -315,9 +439,43 @@
           "$ref": "#/components/schemas/int"
         }
       },
+      "double": {
+        "type": "number",
+        "format": "double"
+      },
       "int": {
         "type": "integer",
         "format": "int32"
+      },
+      "PersonStudent": {
+        "properties": {
+          "discriminator": {
+            "enum": [
+              "student"
+            ],
+            "type": "string"
+          },
+          "gpa": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PersonTeacher": {
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "discriminator": {
+            "enum": [
+              "teacher"
+            ],
+            "type": "string"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/string"
+          }
+        }
       },
       "Product": {
         "type": "object",
@@ -330,11 +488,115 @@
           }
         }
       },
+      "ShapeSquare": {
+        "properties": {
+          "$type": {
+            "enum": [
+              "square"
+            ],
+            "type": "string"
+          },
+          "area": {
+            "$ref": "#/components/schemas/double"
+          },
+          "color": {
+            "$ref": "#/components/schemas/string"
+          },
+          "sides": {
+            "$ref": "#/components/schemas/int"
+          }
+        }
+      },
+      "ShapeTriangle": {
+        "properties": {
+          "$type": {
+            "enum": [
+              "triangle"
+            ],
+            "type": "string"
+          },
+          "hypotenuse": {
+            "$ref": "#/components/schemas/double"
+          },
+          "color": {
+            "$ref": "#/components/schemas/string"
+          },
+          "sides": {
+            "$ref": "#/components/schemas/int"
+          }
+        }
+      },
       "string": {
         "type": "string"
       },
       "Triangle": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "hypotenuse": {
+            "$ref": "#/components/schemas/double"
+          },
+          "color": {
+            "$ref": "#/components/schemas/string"
+          },
+          "sides": {
+            "$ref": "#/components/schemas/int"
+          }
+        }
+      },
+      "WeatherForecastBaseWeatherForecastWithCity": {
+        "required": [
+          "city"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              0
+            ],
+            "type": "integer"
+          },
+          "city": {
+            "$ref": "#/components/schemas/string"
+          }
+        }
+      },
+      "WeatherForecastBaseWeatherForecastWithLocalNews": {
+        "required": [
+          "news"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              2
+            ],
+            "type": "integer"
+          },
+          "news": {
+            "$ref": "#/components/schemas/string"
+          }
+        }
+      },
+      "WeatherForecastBaseWeatherForecastWithTimeSeries": {
+        "required": [
+          "summary"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperatureC": {
+            "$ref": "#/components/schemas/int"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/string"
+          }
+        }
       }
     }
   },

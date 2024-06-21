@@ -326,17 +326,16 @@ internal static class JsonNodeSchemaExtensions
     /// <param name="context">The <see cref="JsonSchemaExporterContext"/> associated with the current type.</param>
     internal static void ApplyPolymorphismOptions(this JsonNode schema, JsonSchemaExporterContext context)
     {
-        if (context.TypeInfo.PolymorphismOptions is { } polymorphismOptions)
+        if (context.TypeInfo.PolymorphismOptions is { } polymorphismOptions && context.Path.Length == 0)
         {
             var mappings = new JsonObject();
             foreach (var derivedType in polymorphismOptions.DerivedTypes)
             {
-                if (derivedType.TypeDiscriminator is null)
+                if (derivedType.TypeDiscriminator is { } discriminator)
                 {
-                    continue;
+                    var jsonDerivedType = context.TypeInfo.Options.GetTypeInfo(derivedType.DerivedType);
+                    mappings[$"{discriminator}"] = $"#/components/schemas/{context.TypeInfo.GetSchemaReferenceId()}{jsonDerivedType.GetSchemaReferenceId()}";
                 }
-                // TODO: Use the actual reference ID instead of the empty string.
-                mappings[derivedType.TypeDiscriminator.ToString()!] = string.Empty;
             }
             schema[OpenApiSchemaKeywords.DiscriminatorKeyword] = polymorphismOptions.TypeDiscriminatorPropertyName;
             schema[OpenApiSchemaKeywords.DiscriminatorMappingKeyword] = mappings;

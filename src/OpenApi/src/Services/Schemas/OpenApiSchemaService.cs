@@ -83,6 +83,7 @@ internal sealed class OpenApiSchemaService(
             }
             schema.ApplyPrimitiveTypesAndFormats(context);
             schema.ApplySchemaReferenceId(context);
+            schema.ApplyPolymorphismOptions(context);
             if (context.PropertyInfo is { AttributeProvider: { } attributeProvider })
             {
                 schema.ApplyNullabilityContextInfo(attributeProvider);

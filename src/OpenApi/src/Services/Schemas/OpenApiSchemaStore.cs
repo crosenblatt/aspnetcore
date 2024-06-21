@@ -99,9 +99,12 @@ internal sealed class OpenApiSchemaStore
         }
         if (schema.AnyOf is not null)
         {
+            var parentSchemaIdea = schema.Extensions[OpenApiConstants.SchemaId] is OpenApiString { Value: string schemaId }
+                ? schemaId
+                : null;
             foreach (var anyOfSchema in schema.AnyOf)
             {
-                AddOrUpdateSchemaByReference(anyOfSchema);
+                AddOrUpdateSchemaByReference(anyOfSchema, parentSchemaIdea);
             }
         }
         if (schema.Properties is not null)
@@ -113,8 +116,9 @@ internal sealed class OpenApiSchemaStore
         }
     }
 
-    private void AddOrUpdateSchemaByReference(OpenApiSchema schema)
+    private void AddOrUpdateSchemaByReference(OpenApiSchema schema, string? parentSchemaId = null)
     {
+        var targetReferenceId = parentSchemaId is not null ? $"{parentSchemaId}{GetSchemaReferenceId(schema)}" : GetSchemaReferenceId(schema);
         if (SchemasByReference.TryGetValue(schema, out var referenceId))
         {
             // If we've already used this reference ID else where in the document, increment a counter value to the reference
@@ -146,7 +150,6 @@ internal sealed class OpenApiSchemaStore
             // two schemas are distinct.
             if (referenceId == null)
             {
-                var targetReferenceId = GetSchemaReferenceId(schema);
                 if (_referenceIdCounter.TryGetValue(targetReferenceId, out var counter))
                 {
                     counter++;
@@ -162,7 +165,7 @@ internal sealed class OpenApiSchemaStore
         }
         else
         {
-            SchemasByReference[schema] = null;
+            SchemasByReference[schema] = parentSchemaId is not null ? targetReferenceId : null;
         }
     }
 
